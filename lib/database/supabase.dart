@@ -17,6 +17,8 @@ Future<void> initSupabase() async {
     anonKey: dotenv.env['SUPABASE_KEY']!,
   );
 
+  print("userbase initilezed!");
+
   if (user != null) {
     print("fetch data");
   } else {
@@ -27,6 +29,7 @@ Future<void> initSupabase() async {
 
 
 Future<void> signUp(String email, String password) async {
+  final supabase = Supabase.instance.client;
   final response = await supabase.auth.signUp(email: email, password: password);
   if (response.user != null) {
     print("User signed up: ${response.user!.id}");
@@ -41,4 +44,9 @@ Future<void> signIn(String email, String password) async {
   if (response.user != null) {
     print("User signed in: ${response.user!.id}");
   }
+}
+
+Future<bool> isLoggedIn() async {
+  final user = supabase.auth.currentUser;
+  return user != null;
 }

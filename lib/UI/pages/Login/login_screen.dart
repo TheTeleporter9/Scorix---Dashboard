@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-final supabase = Supabase.instance.client;
-
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final VoidCallback? onLoginSuccess;
+  const LoginScreen({super.key, this.onLoginSuccess});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -15,9 +14,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
+  // Safe getter for the Supabase client
+  SupabaseClient get supabase => Supabase.instance.client;
+
   Future<void> signIn() async {
     setState(() => isLoading = true);
-
     try {
       final response = await supabase.auth.signInWithPassword(
         email: emailController.text,
@@ -27,14 +28,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = response.user;
       if (user != null) {
         print('Signed in: ${user.id}');
-        // After login, you can fetch team data
         final team = await getTeam();
         print('Team: $team');
 
-        // Navigate to home screen or main app
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
+        // Call callback if provided
+        if (widget.onLoginSuccess != null) {
+          widget.onLoginSuccess!();
         }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login failed: Invalid credentials')));
       }
     } catch (e) {
       print('Error signing in: $e');
@@ -47,7 +50,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> signUp() async {
     setState(() => isLoading = true);
-
     try {
       final response = await supabase.auth.signUp(
         email: emailController.text,
@@ -109,24 +111,25 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
 
-// Example getTeam function
-Future<Map<String, dynamic>?> getTeam() async {
-  final user = supabase.auth.currentUser;
-  if (user == null) return null;
+  // Example getTeam function
+  Future<Map<String, dynamic>?> getTeam() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return null;
 
-  try {
-    final data = await supabase
-        .from('teams')
-        .select('name, school')
-        .eq('user_id', user.id)
-        .maybeSingle();
+    try {
+      final data = await supabase
+          .from('teams')
+          .select('name, school')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-    print('Team data: $data');
-    return data as Map<String, dynamic>?;
-  } catch (e) {
-    print('Error fetching team: $e');
-    return null;
+      print('Team data: $data');
+      return data;
+    } catch (e) {
+      print('Error fetching team: $e');
+      return null;
+    }
   }
+
 }
