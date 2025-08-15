@@ -4,11 +4,10 @@ import 'package:dashboard/UI/TabNavBar.dart';
 import 'package:dashboard/database/supabase.dart';
 import 'package:dashboard/UI/pages/Login/login_screen.dart';
 
-void main() {
-
-  initSupabase();
-
-  runApp(const MainApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initSupabase();
+  runApp(MainApp());
 }
 
 
