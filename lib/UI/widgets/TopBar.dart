@@ -1,3 +1,4 @@
+import 'package:dashboard/UI/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 
 class TopBar extends StatelessWidget {
@@ -11,7 +12,7 @@ class TopBar extends StatelessWidget {
     const String eventTitle = 'WRO Robosports Championship 2025';
     const String onlineStatus = '4/4 Online';
     final Color onlineStatusBg = Colors.grey.shade200;
-    const String eventVenue = 'Singapore Expo';
+    const String eventVenue = 'Johannesburg Expo';
     const String eventVenueDetail = 'Convention Center';
     const String eventDate = 'Aug 3, 2025';
     const int eventTemperature = 26;
@@ -62,6 +63,7 @@ class TopBar extends StatelessWidget {
           ),
           child: Text(onlineStatus, style: const TextStyle(fontSize: 12)),
         ),
+        UserAvatar(radius: 15)
         ],
       ),
       const SizedBox(height: 6),
