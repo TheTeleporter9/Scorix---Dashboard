@@ -1,41 +1,31 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
 
+/// Initialize Supabase with dotenv variables
 Future<void> initSupabase() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  final user = supabase.auth.currentUser;
-
   // Load environment variables
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: "env.dev");
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_KEY']!,
   );
-
-  print("userbase initilezed!");
-
-  if (user != null) {
-    print("fetch data");
-  } else {
-    print("no useer/ directing to login sreen");
-  }
-
 }
 
-
+/// Sign up a new user
 Future<void> signUp(String email, String password) async {
-  final supabase = Supabase.instance.client;
-  final response = await supabase.auth.signUp(email: email, password: password);
+  final response = await supabase.auth.signUp(
+    email: email,
+    password: password,
+  );
   if (response.user != null) {
     print("User signed up: ${response.user!.id}");
   }
 }
 
+/// Sign in an existing user
 Future<void> signIn(String email, String password) async {
   final response = await supabase.auth.signInWithPassword(
     email: email,
@@ -46,6 +36,7 @@ Future<void> signIn(String email, String password) async {
   }
 }
 
+/// Check if a user is logged in
 Future<bool> isLoggedIn() async {
   final user = supabase.auth.currentUser;
   return user != null;
